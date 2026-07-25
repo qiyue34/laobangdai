@@ -27,7 +27,7 @@ router.get('/', asyncHandler(async (req, res) => {
 
   const items = await db.all(
     `SELECT id, title, category, type, filename, original_name, file_size, uploaded_at, views
-     FROM media WHERE is_private = 1 AND user_id = $1 ORDER BY uploaded_at DESC LIMIT $2 OFFSET $3`,
+     FROM media WHERE is_private = 1 AND user_id = $1 ORDER BY uploaded_at DESC LIMIT $2::int OFFSET $3::int`,
     [userId, limit, offset]
   );
 
@@ -61,7 +61,7 @@ router.get('/category/:name', asyncHandler(async (req, res) => {
 
   const items = await db.all(
     `SELECT id, title, category, type, filename, original_name, file_size, uploaded_at, views
-     FROM media WHERE category = $1 AND is_private = 1 AND user_id = $2 ORDER BY uploaded_at DESC LIMIT $3 OFFSET $4`,
+     FROM media WHERE category = $1 AND is_private = 1 AND user_id = $2 ORDER BY uploaded_at DESC LIMIT $3::int OFFSET $4::int`,
     [category, userId, limit, offset]
   );
 

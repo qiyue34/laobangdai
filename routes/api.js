@@ -18,14 +18,14 @@ router.get('/media', asyncHandler(async (req, res) => {
     total = await db.get('SELECT COUNT(*) AS count FROM media WHERE category = $1 AND (is_private IS NULL OR is_private = 0)', [category]);
     items = await db.all(
       `SELECT id, title, category, type, filename, original_name, file_size, uploaded_at, views
-       FROM media WHERE category = $1 AND (is_private IS NULL OR is_private = 0) ORDER BY uploaded_at DESC LIMIT $2 OFFSET $3`,
+       FROM media WHERE category = $1 AND (is_private IS NULL OR is_private = 0) ORDER BY uploaded_at DESC LIMIT $2::int OFFSET $3::int`,
       [category, limit, offset]
     );
   } else {
     total = await db.get('SELECT COUNT(*) AS count FROM media WHERE is_private IS NULL OR is_private = 0');
     items = await db.all(
       `SELECT id, title, category, type, filename, original_name, file_size, uploaded_at, views
-       FROM media WHERE is_private IS NULL OR is_private = 0 ORDER BY uploaded_at DESC LIMIT $1 OFFSET $2`,
+       FROM media WHERE is_private IS NULL OR is_private = 0 ORDER BY uploaded_at DESC LIMIT $1::int OFFSET $2::int`,
       [limit, offset]
     );
   }
