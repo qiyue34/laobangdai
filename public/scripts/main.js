@@ -12,7 +12,14 @@
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   }
 
-  // ===== 1. 滚动渐显 =====
+  // ===== 0. PWA Service Worker 注册 =====
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js').catch(function () {});
+  });
+}
+
+// ===== 1. 滚动渐显 =====
   function initScrollReveal() {
     var items = document.querySelectorAll(
       '.media-card, .category-card, .hero-section, .page-header, h4.border-bottom'
