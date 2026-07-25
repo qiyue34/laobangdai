@@ -1,0 +1,107 @@
+<%- include('partials/header', { title: item.title, currentCategory, categories, categoryCounts }) %>
+
+<div class="row">
+  <!-- 媒体展示 -->
+  <div class="col-lg-8 mb-4">
+    <div class="card detail-image">
+      <div class="card-body p-0">
+        <% if (item.isVideo) { %>
+          <video class="w-100 rounded" controls autoplay playsinline style="max-height: 70vh;">
+            <source src="/uploads/videos/<%= item.filename %>" type="<%= item.mime_type %>">
+            您的浏览器不支持视频播放
+          </video>
+        <% } else { %>
+          <a href="/uploads/photos/<%= item.filename %>" target="_blank">
+            <img src="/uploads/photos/<%= item.filename %>" class="w-100 rounded" alt="<%= item.title %>"
+                 style="max-height: 70vh; object-fit: contain;">
+          </a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- 信息侧边栏 -->
+  <div class="col-lg-4 mb-4">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title"><%= item.title %></h4>
+
+        <div class="d-flex align-items-center mb-2">
+          <span class="badge bg-secondary me-2"><%= item.category %></span>
+          <small class="text-muted">
+            <% if (item.isVideo) { %>🎬 视频<% } else { %>🖼 照片<% } %>
+          </small>
+        </div>
+
+        <% if (item.description) { %>
+          <p class="card-text text-muted mt-3"><%= item.description %></p>
+        <% } %>
+
+        <hr>
+
+        <ul class="list-unstyled meta-list">
+          <li class="mb-2">
+            <span class="text-muted">📅 上传时间</span><br>
+            <strong><%= item.uploaded_at %></strong>
+          </li>
+          <li class="mb-2">
+            <span class="text-muted">📁 文件大小</span><br>
+            <strong><%= item.fileSizeFormatted %></strong>
+          </li>
+          <li class="mb-2">
+            <span class="text-muted">👁 浏览</span><br>
+            <strong><%= item.views + 1 %> 次</strong>
+          </li>
+          <li class="mb-2">
+            <span class="text-muted">📄 文件名</span><br>
+            <strong class="small"><%= item.original_name %></strong>
+          </li>
+        </ul>
+
+        <hr>
+
+        <!-- 操作按钮 -->
+        <div class="d-flex gap-2">
+          <a href="/media/<%= item.id %>/download" class="btn btn-success flex-fill">⬇ 下载</a>
+          <a href="/" class="btn btn-outline-secondary flex-fill">← 返回</a>
+          <a href="/media/<%= item.id %>/delete" class="btn btn-outline-danger"
+             onclick="return confirm('确定要删除这个文件吗？')">🗑</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 同类推荐 -->
+    <% if (typeof related !== 'undefined' && related.length > 0) { %>
+    <div class="card mt-3">
+      <div class="card-header bg-white">
+        <h6 class="mb-0">更多 <strong><%= item.category %></strong></h6>
+      </div>
+      <div class="card-body">
+        <div class="row g-2">
+          <% related.forEach(function(r) { %>
+          <div class="col-6">
+            <a href="/media/<%= r.id %>" class="text-decoration-none">
+              <div class="related-item">
+                <% if (r.type === 'video') { %>
+                  <div class="related-thumb video-thumb-sm">
+                    <video preload="metadata" muted>
+                      <source src="/uploads/videos/<%= r.filename %>">
+                    </video>
+                    <span class="play-icon-sm">▶</span>
+                  </div>
+                <% } else { %>
+                  <img src="/uploads/photos/<%= r.filename %>" class="related-thumb" alt="<%= r.title %>" loading="lazy">
+                <% } %>
+                <small class="d-block text-truncate mt-1"><%= r.title %></small>
+              </div>
+            </a>
+          </div>
+          <% }) %>
+        </div>
+      </div>
+    </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,36 @@
+<%- include('partials/header', { title: '私人区域', currentCategory, categories, categoryCounts }) %>
+
+<!-- 私人区域标题 -->
+<div class="d-flex align-items-center justify-content-between mb-4 pb-3" style="border-bottom: 1px solid rgba(0,0,0,0.06);">
+  <div class="d-flex align-items-center gap-2">
+    <span class="display-6">🔒</span>
+    <div>
+      <h3 class="mb-0"><%= typeof username !== 'undefined' ? username : '' %> 的私人空间</h3>
+      <small class="text-muted">只有你能看到的内容</small>
+    </div>
+  </div>
+  <a href="/logout" class="btn btn-outline-secondary btn-sm">退出</a>
+</div>
+
+<!-- 分类快捷入口（仅显示有私密内容的分类） -->
+<% var catIcons = { '日常': '📝', '话剧': '🎭', '游戏': '🎮', '风景': '🏞️' }; %>
+<div class="row g-2 mb-4">
+  <% (typeof categories !== 'undefined' ? categories : []).forEach(function(cat) { %>
+  <div class="col-6 col-md-3">
+    <a href="/private/category/<%= encodeURIComponent(cat) %>" class="text-decoration-none">
+      <div class="card category-card text-center h-100 py-2" style="border-color:rgba(255,200,50,0.2);">
+        <div class="card-body py-2">
+          <span class="category-icon"><%= catIcons[cat] || '📁' %></span>
+          <h6 class="mb-0 small"><%= cat %></h6>
+        </div>
+      </div>
+    </a>
+  </div>
+  <% }) %>
+</div>
+
+<!-- 私密内容展示 -->
+<%- include('partials/mediaCard', { items }) %>
+<%- include('partials/pagination', { page, totalPages }) %>
+
+<%- include('partials/footer') %>

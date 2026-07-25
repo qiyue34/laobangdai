@@ -1,0 +1,44 @@
+<% if (typeof items !== 'undefined' && items.length > 0) { %>
+  <div class="masonry-grid">
+    <% items.forEach(function(item) { %>
+      <div class="masonry-item">
+        <a href="/media/<%= item.id %>" class="text-decoration-none">
+          <div class="card media-card">
+            <% if (item.type === 'video') { %>
+              <div class="card-img-wrap video-thumb">
+                <video preload="metadata" muted>
+                  <source src="/uploads/videos/<%= item.filename %>" type="<%= item.mime_type || 'video/mp4' %>">
+                </video>
+                <div class="play-overlay">
+                  <span class="play-icon">▶</span>
+                </div>
+              </div>
+            <% } else { %>
+              <div class="card-img-wrap">
+                <div class="image-placeholder"></div>
+                <img src="/uploads/photos/<%= item.filename %>" alt="<%= item.title %>"
+                     loading="lazy"
+                     onload="this.previousElementSibling && this.previousElementSibling.remove()"
+                     onerror="this.parentElement.innerHTML='<div class=\\'no-preview\\'><span>🖼</span><br>暂无预览</div>'">
+              </div>
+            <% } %>
+            <div class="card-body p-2">
+              <h6 class="card-title text-truncate mb-1"><%= item.title %></h6>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="badge category-badge"><%= item.category %></span>
+                <small class="text-muted"><%= item.uploaded_at %></small>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    <% }) %>
+  </div>
+<% } else { %>
+  <div class="empty-state">
+    <div class="empty-icon">📭</div>
+    <h4>还没有内容</h4>
+    <p class="text-muted">成为第一个上传的人吧！</p>
+    <a href="/upload" class="btn btn-primary btn-lg mt-2">立即上传</a>
+  </div>
+<% } %>

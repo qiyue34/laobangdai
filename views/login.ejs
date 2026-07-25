@@ -1,0 +1,58 @@
+<%- include('partials/header', { title: '登录', currentCategory: null, categories, categoryCounts }) %>
+
+<div class="row justify-content-center mt-5">
+  <div class="col-md-5 col-lg-4">
+    <div class="card">
+      <div class="card-body p-4 text-center">
+        <div class="display-4 mb-3">🔒</div>
+        <h4 class="mb-2"><%= typeof reg !== 'undefined' && reg ? '注册' : '登录' %></h4>
+        <p class="text-muted small mb-4">
+          <%= typeof reg !== 'undefined' && reg ? '创建你的私人空间' : '进入你的私人空间' %>
+        </p>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+          <div class="alert alert-danger py-2 small"><%= error %></div>
+        <% } %>
+
+        <% if (typeof reg !== 'undefined' && reg) { %>
+          <!-- 注册表单 -->
+          <form action="/login/register" method="POST">
+            <div class="mb-2">
+              <input type="text" name="username" class="form-control text-center" placeholder="用户名" required autofocus maxlength="20">
+            </div>
+            <div class="mb-2">
+              <input type="password" name="password" class="form-control text-center" placeholder="密码（至少4位）" required>
+            </div>
+            <div class="mb-3">
+              <input type="password" name="confirm" class="form-control text-center" placeholder="确认密码" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">注册</button>
+          </form>
+          <div class="mt-3 small">
+            <span class="text-muted">已有账号？</span>
+            <a href="/login">去登录</a>
+          </div>
+        <% } else { %>
+          <!-- 登录表单 -->
+          <form action="/login" method="POST">
+            <div class="mb-2">
+              <input type="text" name="username" class="form-control text-center" placeholder="用户名" required autofocus>
+            </div>
+            <div class="mb-3">
+              <input type="password" name="password" class="form-control text-center" placeholder="密码" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">登录</button>
+          </form>
+          <div class="mt-3 small">
+            <span class="text-muted">还没有账号？</span>
+            <a href="/login/register">注册一个</a>
+          </div>
+        <% } %>
+
+        <a href="/" class="btn btn-sm btn-link mt-2 text-muted">← 返回首页</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

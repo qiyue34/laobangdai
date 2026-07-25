@@ -1,0 +1,10 @@
+<%- include('partials/header', { title: '错误', currentCategory: null, categories: [], categoryCounts: {} }) %>
+
+<div class="text-center py-5">
+  <div class="display-1 mb-3">😕</div>
+  <h2><%= typeof message !== 'undefined' ? message : '出错了' %></h2>
+  <p class="text-muted mb-4">请稍后再试</p>
+  <a href="<%= typeof backLink !== 'undefined' ? backLink : '/' %>" class="btn btn-primary btn-lg">返回</a>
+</div>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,16 @@
+<%- include('partials/header', { title: category, currentCategory, categories, categoryCounts }) %>
+
+<!-- 分类标题 -->
+<% var catIcons = { '日常': '📝', '话剧': '🎭', '游戏': '🎮', '风景': '🏞️' }; %>
+<div class="page-header d-flex align-items-center mb-4 pb-3" style="border-bottom: 1px solid rgba(0,0,0,0.06);">
+  <span class="display-6 me-3"><%= catIcons[category] || '📁' %></span>
+  <div>
+    <h3 class="mb-0"><%= category %></h3>
+    <small class="text-muted">共 <%= typeof items !== 'undefined' ? items.length : 0 %> 个作品</small>
+  </div>
+</div>
+
+<%- include('partials/mediaCard', { items }) %>
+<%- include('partials/pagination', { page, totalPages }) %>
+
+<%- include('partials/footer') %>

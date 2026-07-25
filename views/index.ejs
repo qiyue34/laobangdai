@@ -1,0 +1,33 @@
+<%- include('partials/header', { title: '首页', currentCategory, categories, categoryCounts }) %>
+
+<!-- Hero 区 -->
+<div class="hero-section text-center py-5 mb-5">
+  <h1 class="hero-title">拾光影集</h1>
+  <p class="lead">分享你的每一个精彩瞬间</p>
+  <a href="/upload" class="btn btn-primary btn-lg px-4 mt-2">⬆ 上传照片或视频</a>
+</div>
+
+<!-- 分类快捷入口 -->
+<div class="row g-3 mb-5">
+  <% var catIcons = { '日常': '📝', '话剧': '🎭', '游戏': '🎮', '风景': '🏞️' }; %>
+  <% (typeof categories !== 'undefined' ? categories : []).forEach(function(cat) { %>
+  <div class="col-6 col-md-3">
+    <a href="/category/<%= encodeURIComponent(cat) %>" class="text-decoration-none">
+      <div class="card category-card text-center h-100">
+        <div class="card-body py-3">
+          <span class="category-icon"><%= catIcons[cat] || '📁' %></span>
+          <h6 class="mb-0"><%= cat %></h6>
+          <small class="text-muted"><%= (typeof categoryCounts !== 'undefined' && categoryCounts[cat]) ? categoryCounts[cat] + ' 个作品' : '暂无内容' %></small>
+        </div>
+      </div>
+    </a>
+  </div>
+  <% }) %>
+</div>
+
+<!-- 内容展示 -->
+<div class="section-header"><h4>最新上传</h4></div>
+<%- include('partials/mediaCard', { items }) %>
+<%- include('partials/pagination', { page, totalPages }) %>
+
+<%- include('partials/footer') %>
