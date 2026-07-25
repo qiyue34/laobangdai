@@ -293,8 +293,10 @@
       initNavShadow();
       initSounds();
       window.showToast = showToast;
+      document.body.classList.add('page-ready');
     } catch (e) {
       console.warn('Init error:', e);
+      document.body.classList.add('page-ready');
     }
   }
 
