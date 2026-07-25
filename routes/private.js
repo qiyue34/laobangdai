@@ -22,12 +22,12 @@ router.get('/', asyncHandler(async (req, res) => {
   const limit = 20;
   const offset = (page - 1) * limit;
 
-  const totalRow = await db.get('SELECT COUNT(*) AS count FROM media WHERE is_private = 1 AND user_id = ?', [userId]);
+  const totalRow = await db.get('SELECT COUNT(*) AS count FROM media WHERE is_private = 1 AND user_id = $1', [userId]);
   const totalPages = Math.ceil(totalRow.count / limit);
 
   const items = await db.all(
     `SELECT id, title, category, type, filename, original_name, file_size, uploaded_at, views
-     FROM media WHERE is_private = 1 AND user_id = ? ORDER BY uploaded_at DESC LIMIT ? OFFSET ?`,
+     FROM media WHERE is_private = 1 AND user_id = $1 ORDER BY uploaded_at DESC LIMIT $2 OFFSET $3`,
     [userId, limit, offset]
   );
 
@@ -55,13 +55,13 @@ router.get('/category/:name', asyncHandler(async (req, res) => {
   const offset = (page - 1) * limit;
 
   const totalRow = await db.get(
-    'SELECT COUNT(*) AS count FROM media WHERE category = ? AND is_private = 1 AND user_id = ?', [category, userId]
+    'SELECT COUNT(*) AS count FROM media WHERE category = $1 AND is_private = 1 AND user_id = $2', [category, userId]
   );
   const totalPages = Math.ceil(totalRow.count / limit);
 
   const items = await db.all(
     `SELECT id, title, category, type, filename, original_name, file_size, uploaded_at, views
-     FROM media WHERE category = ? AND is_private = 1 AND user_id = ? ORDER BY uploaded_at DESC LIMIT ? OFFSET ?`,
+     FROM media WHERE category = $1 AND is_private = 1 AND user_id = $2 ORDER BY uploaded_at DESC LIMIT $3 OFFSET $4`,
     [category, userId, limit, offset]
   );
 

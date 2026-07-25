@@ -24,7 +24,7 @@ router.get('/', asyncHandler(async (req, res) => {
 
   const items = await db.all(
     `SELECT id, title, category, type, filename, original_name, file_size, uploaded_at, views
-     FROM media WHERE is_private IS NULL OR is_private = 0 ORDER BY uploaded_at DESC LIMIT ? OFFSET ?`,
+     FROM media WHERE is_private IS NULL OR is_private = 0 ORDER BY uploaded_at DESC LIMIT $1 OFFSET $2`,
     [limit, offset]
   );
 
@@ -51,12 +51,12 @@ router.get('/category/:name', asyncHandler(async (req, res) => {
   const limit = 20;
   const offset = (page - 1) * limit;
 
-  const totalRow = await db.get('SELECT COUNT(*) AS count FROM media WHERE category = ? AND (is_private IS NULL OR is_private = 0)', [category]);
+  const totalRow = await db.get('SELECT COUNT(*) AS count FROM media WHERE category = $1 AND (is_private IS NULL OR is_private = 0)', [category]);
   const totalPages = Math.ceil(totalRow.count / limit);
 
   const items = await db.all(
     `SELECT id, title, category, type, filename, original_name, file_size, uploaded_at, views
-     FROM media WHERE category = ? AND (is_private IS NULL OR is_private = 0) ORDER BY uploaded_at DESC LIMIT ? OFFSET ?`,
+     FROM media WHERE category = $1 AND (is_private IS NULL OR is_private = 0) ORDER BY uploaded_at DESC LIMIT $1 OFFSET $2`,
     [category, limit, offset]
   );
 

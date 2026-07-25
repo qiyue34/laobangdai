@@ -24,7 +24,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
 
   const item = await db.get(
     `SELECT id, title, description, category, type, filename, original_name, mime_type, file_size, uploaded_at, views
-     FROM media WHERE id = ?`,
+     FROM media WHERE id = $1`,
     [id]
   );
 
@@ -33,12 +33,12 @@ router.get('/:id', asyncHandler(async (req, res) => {
   }
 
   // 增加浏览量
-  await db.run('UPDATE media SET views = views + 1 WHERE id = ?', [id]);
+  await db.run('UPDATE media SET views = views + 1 WHERE id = $1', [id]);
 
   // 获取同分类的其他媒体（随机推荐4个）
   const related = await db.all(
     `SELECT id, title, type, filename, uploaded_at FROM media
-     WHERE category = ? AND id != ? ORDER BY RANDOM() LIMIT 4`,
+     WHERE category = $1 AND id != $2 ORDER BY RANDOM() LIMIT 4`,
     [item.category, id]
   );
 
@@ -56,7 +56,7 @@ router.get('/:id/download', asyncHandler(async (req, res) => {
   const id = parseInt(req.params.id);
   if (isNaN(id)) return res.redirect('/');
 
-  const item = await db.get('SELECT * FROM media WHERE id = ?', [id]);
+  const item = await db.get('SELECT * FROM media WHERE id = $1', [id]);
   if (!item) return res.redirect('/');
 
   const filePath = path.join(
@@ -77,7 +77,7 @@ router.get('/:id/delete', asyncHandler(async (req, res) => {
   const id = parseInt(req.params.id);
   if (isNaN(id)) return res.redirect('/');
 
-  const item = await db.get('SELECT * FROM media WHERE id = ?', [id]);
+  const item = await db.get('SELECT * FROM media WHERE id = $1', [id]);
   if (!item) return res.redirect('/');
 
   // 删除文件
@@ -86,7 +86,7 @@ router.get('/:id/delete', asyncHandler(async (req, res) => {
     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
   } catch (e) { /* ignore */ }
 
-  await db.run('DELETE FROM media WHERE id = ?', [id]);
+  await db.run('DELETE FROM media WHERE id = $1', [id]);
   res.redirect('/');
 }));
 

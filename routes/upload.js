@@ -90,7 +90,7 @@ router.post('/', (req, res) => {
 
         await db.run(
           `INSERT INTO media (title, description, category, type, filename, original_name, mime_type, file_size, is_private, user_id)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
           [title, description, category, mediaType, file.filename, file.originalname, file.mimetype, file.size, isPrivate, userId]
         );
         successCount++;

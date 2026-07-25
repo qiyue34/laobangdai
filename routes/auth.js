@@ -43,7 +43,7 @@ router.post('/', asyncHandler(async (req, res) => {
     return res.render('login', { ...navData, error: '请输入用户名和密码', reg: false });
   }
 
-  const user = await db.get('SELECT * FROM users WHERE username = ?', [username]);
+  const user = await db.get('SELECT * FROM users WHERE username = $1', [username]);
   if (!user) {
     const navData = await getNavData();
     return res.render('login', { ...navData, error: '用户名或密码错误', reg: false });
@@ -88,7 +88,7 @@ router.post('/register', asyncHandler(async (req, res) => {
   }
 
   // 检查重名
-  const exist = await db.get('SELECT id FROM users WHERE username = ?', [username]);
+  const exist = await db.get('SELECT id FROM users WHERE username = $1', [username]);
   if (exist) {
     const navData = await getNavData();
     return res.render('login', { ...navData, error: '用户名已被注册', reg: true });
@@ -96,10 +96,10 @@ router.post('/register', asyncHandler(async (req, res) => {
 
   const salt = makeSalt();
   const hpwd = hash(password, salt);
-  await db.run('INSERT INTO users (username, password, salt) VALUES (?, ?, ?)', [username, hpwd, salt]);
+  await db.run('INSERT INTO users (username, password, salt) VALUES ($1, $2, $3)', [username, hpwd, salt]);
 
   // 自动登录
-  const user = await db.get('SELECT id FROM users WHERE username = ?', [username]);
+  const user = await db.get('SELECT id FROM users WHERE username = $1', [username]);
   req.session.userId = user.id;
   req.session.username = username;
   res.redirect('/private');
