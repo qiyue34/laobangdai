@@ -56,7 +56,7 @@ router.get('/category/:name', asyncHandler(async (req, res) => {
 
   const items = await db.all(
     `SELECT id, title, category, type, filename, original_name, file_size, uploaded_at, views
-     FROM media WHERE category = $1 AND (is_private IS NULL OR is_private = 0) ORDER BY uploaded_at DESC LIMIT $1 OFFSET $2`,
+     FROM media WHERE category = $1 AND (is_private IS NULL OR is_private = 0) ORDER BY uploaded_at DESC LIMIT $2 OFFSET $3`,
     [category, limit, offset]
   );
 
