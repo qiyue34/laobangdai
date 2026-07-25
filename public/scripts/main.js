@@ -319,7 +319,7 @@
   // 所有已选文件（累加）
   var allFiles = [];
 
-  // ===== 把 allFiles 写回 fileInput（用于表单提交） =====
+  // ===== 把 allFiles 写回 fileInput =====
   function syncInput() {
     try {
       var dt = new DataTransfer();
@@ -327,9 +327,7 @@
         dt.items.add(allFiles[i]);
       }
       fileInput.files = dt.files;
-    } catch (e) {
-      // 不支持 DataTransfer 的老旧浏览器 fallback
-    }
+    } catch (e) {}
   }
 
   // ===== 刷新预览 =====
@@ -443,16 +441,67 @@
     submitBtn.disabled = !(allFiles.length > 0 && hasCat);
   }
 
-  // 表单提交
+  // 表单提交 — 用 XHR + FormData（最可靠）
   if (uploadForm) {
-    uploadForm.addEventListener('submit', function () {
-      if (allFiles.length > 0) {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>上传 ' + allFiles.length + ' 个文件...';
-        uploadProgress.classList.remove('d-none');
-        progressBar.style.width = '60%';
-        progressBar.textContent = '60%';
+    uploadForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (allFiles.length === 0) return;
+
+      var cat = document.querySelector('.category-radio:checked');
+      if (!cat) return;
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>上传 ' + allFiles.length + ' 个文件...';
+      uploadProgress.classList.remove('d-none');
+      progressBar.style.width = '10%';
+      progressBar.textContent = '10%';
+
+      var fd = new FormData();
+      fd.append('category', cat.value);
+      var titleEl = document.getElementById('title');
+      if (titleEl && titleEl.value) fd.append('title', titleEl.value);
+      var descEl = document.getElementById('description');
+      if (descEl && descEl.value) fd.append('description', descEl.value);
+      var privEl = document.getElementById('isPrivate');
+      if (privEl && privEl.checked) fd.append('is_private', '1');
+
+      for (var i = 0; i < allFiles.length; i++) {
+        fd.append('file', allFiles[i]);
       }
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/upload', true);
+
+      xhr.upload.onprogress = function (e) {
+        if (e.lengthComputable) {
+          var pct = Math.round((e.loaded / e.total) * 70) + 10;
+          progressBar.style.width = pct + '%';
+          progressBar.textContent = pct + '%';
+        }
+      };
+
+      xhr.onload = function () {
+        if (xhr.status >= 200 && xhr.status < 400) {
+          // 成功：跳转到首页
+          window.location.href = xhr.responseURL || '/?uploaded=' + allFiles.length;
+        } else {
+          // 失败：找错误信息
+          var match = xhr.responseText.match(/alert-danger[^>]*>([^<]+)/);
+          alert(match ? match[1].trim() : '上传失败');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '⬆ 上传';
+          uploadProgress.classList.add('d-none');
+        }
+      };
+
+      xhr.onerror = function () {
+        alert('网络错误，请重试');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '⬆ 上传';
+        uploadProgress.classList.add('d-none');
+      };
+
+      xhr.send(fd);
     });
   }
 })();
