@@ -88,10 +88,18 @@ router.post('/', (req, res) => {
         const title = req.body.title?.trim() || file.originalname.replace(/\.[^/.]+$/, '');
         const mediaType = detectType(file.mimetype, file.originalname);
 
+        // 读取文件内容到数据库（重启不丢失）
+        const fs = require('fs');
+        let fileData = null;
+        try {
+          fileData = fs.readFileSync(file.path).toString('base64');
+          try { fs.unlinkSync(file.path); } catch(e) {}
+        } catch(e) {}
+
         await db.run(
-          `INSERT INTO media (title, description, category, type, filename, original_name, mime_type, file_size, is_private, user_id)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-          [title, description, category, mediaType, file.filename, file.originalname, file.mimetype, file.size, isPrivate, userId]
+          `INSERT INTO media (title, description, category, type, filename, original_name, mime_type, file_size, is_private, user_id, file_data)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+          [title, description, category, mediaType, file.filename, file.originalname, file.mimetype, file.size, isPrivate, userId, fileData]
         );
         successCount++;
       }

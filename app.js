@@ -38,8 +38,29 @@ app.use(session({
   cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24小时
 }));
 
-// 暴露 uploads 目录供访问上传的文件
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// 文件服务：优先本地，数据库持久化做后备
+const serveStatic = express.static(path.join(__dirname, 'uploads'));
+app.use('/uploads', async (req, res, next) => {
+  const filePath = path.join(__dirname, 'uploads', req.path.replace(/^\//, ''));
+  if (require('fs').existsSync(filePath)) {
+    serveStatic(req, res, next);
+  } else {
+    // 从数据库读取
+    try {
+      const filename = req.path.split('/').pop();
+      const { Pool } = require('pg');
+      const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+      const result = await pool.query('SELECT file_data, mime_type FROM media WHERE filename = $1', [filename]);
+      await pool.end();
+      if (result.rows.length > 0 && result.rows[0].file_data) {
+        res.set('Content-Type', result.rows[0].mime_type || 'image/png');
+        res.set('Cache-Control', 'public, max-age=31536000');
+        return res.send(Buffer.from(result.rows[0].file_data, 'base64'));
+      }
+    } catch(e) { /* ignore */ }
+    res.status(404).send('File not found');
+  }
+});
 
 // 注入登录状态到模板
 app.use((req, res, next) => {

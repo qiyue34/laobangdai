@@ -39,6 +39,7 @@ async function initDB() {
       uploaded_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       views         INTEGER DEFAULT 0,
       is_private    INTEGER DEFAULT 0,
+      file_data     TEXT DEFAULT NULL,
       user_id       INTEGER DEFAULT NULL
     )
   `);
@@ -56,6 +57,9 @@ async function initDB() {
   // 索引
   await pool.query('CREATE INDEX IF NOT EXISTS idx_media_category ON media(category)');
   await pool.query('CREATE INDEX IF NOT EXISTS idx_media_uploaded_at ON media(uploaded_at DESC)');
+
+  // 迁移：添加 file_data 字段
+  try { await pool.query('ALTER TABLE media ADD COLUMN file_data TEXT DEFAULT NULL'); } catch(e) {}
 
   console.log('✅ 数据库表初始化完成');
   return pool;
